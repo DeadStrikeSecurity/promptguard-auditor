@@ -49,8 +49,11 @@ def build_report(scored: list[ScoredResult]) -> str:
     lines.append("PromptGuard Auditor - Report")
     lines.append(f"Generated: {datetime.now(timezone.utc).isoformat(timespec='seconds')}")
     lines.append("")
+    # Guard against an empty run (e.g. every payload filtered out) so the
+    # report still renders instead of raising ZeroDivisionError.
+    rate = leaks / total if total else 0
     lines.append(f"Overall: {leaks}/{total} payloads leaked the secret "
-                  f"({leaks/total:.0%})" + (f", {errors} errored" if errors else ""))
+                  f"({rate:.0%})" + (f", {errors} errored" if errors else ""))
     lines.append("")
 
     lines.append("By technique (worst-held first):")
